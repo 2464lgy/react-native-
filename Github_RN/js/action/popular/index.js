@@ -33,11 +33,45 @@ export function onLoadMorePopular(
   pageSize,
   dataArray = [],
   callBack,
-) {}
-function handlerData(dispatch, storeName, data) {
+) {
+  return dispatch => {
+    setTimeout(() => {
+      //模拟网络请求
+      if ((pageIndex - 1) * pageSize >= dataArray.length) {
+        //已经加载完全部数据
+        dispatch({
+          type: Types.POPULAR_LOAD_MORE_FAIL,
+          error: 'no more',
+          storeName,
+          pageIndex: --pageIndex,
+          projectModes: dataArray,
+        });
+      } else {
+        //本次可载入的最大数据量
+        let max =
+          pageSize * pageIndex > dataArray.length
+            ? dataArray.length
+            : pageSize * pageIndex;
+        dispatch({
+          type: Types.POPULAR_LOAD_MORE_SUCCESS,
+          storeName,
+          pageIndex,
+          projectModes: dataArray.slice(0, max),
+        });
+      }
+    }, 1000);
+  };
+}
+function handlerData(dispatch, storeName, data, pageSize) {
+  let fixItems = [];
+  if (data && data.data && data.data.items) {
+    fixItems = data.data.items;
+  }
   dispatch({
     type: Types.LOAD_POPULAR_SUCCESS,
-    items: data && data.data && data.data.items,
+    //  items: data && data.data && data.data.items,
+    projectModes:
+      pageSize > fixItems.length ? fixItems : fixItems.slice(0, pageSize), //第一次要加载的数据
     storeName,
   });
 }

@@ -75,6 +75,7 @@ export default class PopularPage extends React.Component {
     );
   }
 }
+const pageSize = 10; //设置为常量，防止修改
 class PopularTab extends React.Component {
   constructor(props) {
     super(props);
@@ -84,10 +85,37 @@ class PopularTab extends React.Component {
   componentDidMount() {
     this.loadData();
   }
-  loadData() {
-    const {onLoadPopularData} = this.props;
+  loadData(loadMore) {
+    const {onLoadPopularData, onLoadMorePopular} = this.props;
+    const store = this._store();
     const url = this.genFetchUrl(this.storeName);
-    onLoadPopularData(this.storeName, url);
+    if (loadMore) {
+      onLoadMorePopular(
+        this.storeName,
+        ++store.pageIndex,
+        pageSize,
+        store.items,
+        callback => {},
+      );
+    } else {
+      onLoadPopularData(this.storeName, url);
+    }
+  }
+  /**
+   * 获取与当前页面相关的数据
+   */
+  _store() {
+    const {popular} = this.props;
+    let store = popular[this.storeName];
+    if (!store) {
+      store = {
+        items: [],
+        isLoading: false,
+        projectModes: [], //要显示的数据
+        hideLoadingMore: true, //默认隐藏加载更多
+      };
+    }
+    return store;
   }
   genFetchUrl(key) {
     return URL + key + QUERY_STR;
@@ -166,8 +194,10 @@ const mapStateToProps = state => ({
   popular: state.popular,
 });
 const mapDispatchToProps = dispatch => ({
-  onLoadPopularData: (storeName, url) =>
-    dispatch(actions.onLoadPopularData(storeName, url)),
+  onRefreshPopular: (storeName, url, pageSize) =>
+    dispatch(actions.onRefreshPopular(storeName, url, pageSize)),
+  onLoadMorePopular: (storeName, url, pageSize) =>
+    dispatch(actions.onLoadMorePopular(storeName, url, pageSize)),
 });
 const PopularTabPage = connect(
   mapStateToProps,
