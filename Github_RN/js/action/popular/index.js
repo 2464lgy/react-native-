@@ -4,7 +4,7 @@ import DataStore from '../../expand/dao/DataStore';
  * 获取最热数据的异步action
  * @param {*} theme
  */
-export function onLoadPopularData(storeName, url, pageSize) {
+export function onRefreshPopular(storeName, url, pageSize) {
   //storeName 分类名称 Java/android/ios
   return dispatch => {
     dispatch({type: Types.POPULAR_REFRESH, storeName});
@@ -17,7 +17,7 @@ export function onLoadPopularData(storeName, url, pageSize) {
       })
       .catch(error => {
         console.log(error);
-        dispatch({type: Types.LOAD_POPULAR_FAIL, storeName, error});
+        dispatch({type: Types.POPULAR_REFRESH_FAIL, storeName, error});
       });
   };
 }
@@ -38,6 +38,9 @@ export function onLoadMorePopular(
     setTimeout(() => {
       //模拟网络请求
       if ((pageIndex - 1) * pageSize >= dataArray.length) {
+        if (typeof callBack === 'function') {
+          callBack('no more');
+        }
         //已经加载完全部数据
         dispatch({
           type: Types.POPULAR_LOAD_MORE_FAIL,
@@ -59,7 +62,7 @@ export function onLoadMorePopular(
           projectModes: dataArray.slice(0, max),
         });
       }
-    }, 1000);
+    }, 500);
   };
 }
 function handlerData(dispatch, storeName, data, pageSize) {
@@ -68,10 +71,11 @@ function handlerData(dispatch, storeName, data, pageSize) {
     fixItems = data.data.items;
   }
   dispatch({
-    type: Types.LOAD_POPULAR_SUCCESS,
+    type: Types.POPULAR_REFRESH_SUCCESS,
     //  items: data && data.data && data.data.items,
     projectModes:
       pageSize > fixItems.length ? fixItems : fixItems.slice(0, pageSize), //第一次要加载的数据
     storeName,
+    pageIndex: 1,
   });
 }
