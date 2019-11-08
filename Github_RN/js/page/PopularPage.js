@@ -114,13 +114,11 @@ class PopularTab extends React.Component {
     if (!store) {
       store = {
         items: [],
-        pageIndex: 0,
         isLoading: false,
         projectModes: [], //要显示的数据
         hideLoadingMore: true, //默认隐藏加载更多
       };
     }
-    console.log(store.pageIndex);
     return store;
   }
   genFetchUrl(key) {
@@ -216,8 +214,16 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   onRefreshPopular: (storeName, url, pageSize) =>
     dispatch(actions.onRefreshPopular(storeName, url, pageSize)),
-  onLoadMorePopular: (storeName, url, pageSize) =>
-    dispatch(actions.onLoadMorePopular(storeName, url, pageSize)),
+  onLoadMorePopular: (storeName, pageIndex, pageSize, dataArray, callBack) =>
+    dispatch(
+      actions.onLoadMorePopular(
+        storeName,
+        pageIndex,
+        pageSize,
+        dataArray,
+        callBack,
+      ),
+    ),
 });
 const PopularTabPage = connect(
   mapStateToProps,

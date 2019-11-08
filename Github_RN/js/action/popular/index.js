@@ -13,7 +13,13 @@ export function onRefreshPopular(storeName, url, pageSize) {
     dataStore
       .fetchData(url)
       .then(data => {
-        handlerData(dispatch, storeName, data, pageSize);
+        handlerData(
+          Types.POPULAR_REFRESH_SUCCESS,
+          dispatch,
+          storeName,
+          data,
+          pageSize,
+        );
       })
       .catch(error => {
         console.log(error);
@@ -65,14 +71,14 @@ export function onLoadMorePopular(
     }, 500);
   };
 }
-function handlerData(dispatch, storeName, data, pageSize) {
+function handlerData(actionType, dispatch, storeName, data, pageSize) {
   let fixItems = [];
   if (data && data.data && data.data.items) {
     fixItems = data.data.items;
   }
   dispatch({
-    type: Types.POPULAR_REFRESH_SUCCESS,
-    //  items: data && data.data && data.data.items,
+    type: actionType,
+    items: data && data.data && data.data.items,
     projectModes:
       pageSize > fixItems.length ? fixItems : fixItems.slice(0, pageSize), //第一次要加载的数据
     storeName,

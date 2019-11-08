@@ -28,6 +28,7 @@ export default function onAction(state = defaultState, action) {
           projectModes: action.projectModes, //此次要展示的数据
           isLoading: false,
           hideLoadingMore: false,
+          pageIndex: action.pageIndex,
         },
       };
     case Types.POPULAR_REFRESH: //下拉刷新
@@ -36,6 +37,7 @@ export default function onAction(state = defaultState, action) {
         [action.storeName]: {
           ...state[action.storeName],
           isLoading: true,
+          hideLoadingMore: true,
         },
       };
     case Types.POPULAR_REFRESH_FAIL: //下拉刷新失败
@@ -65,7 +67,7 @@ export default function onAction(state = defaultState, action) {
           pageIndex: action.pageIndex,
         },
       };
-      
+
     default:
       return state;
   }
