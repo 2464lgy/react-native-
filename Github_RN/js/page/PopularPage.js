@@ -172,9 +172,20 @@ class PopularTab extends React.Component {
           }
           ListFooterComponent={() => this.genIndicator()}
           onEndReached={() => {
-            this.loadData(true);
+            //确保此函数执行在onMomentumScrollBegin执行之后，所以设置延时
+            //这里会多次调用，需要处理
+            console.log('__________________________--');
+            setTimeout(() => {
+              if (this.canLoadMore) {
+                this.loadData(true);
+                this.canLoadMore = false;
+              }
+            }, 100);
           }}
           onEndReachedThreshold={0.5}
+          onMomentumScrollBegin={() => {
+            this.canLoadMore = true; //初始化时页面调用onEndReached的问题
+          }}
         />
         <Toast ref={'toast'} position={'center'} />
       </View>
@@ -225,6 +236,7 @@ const mapDispatchToProps = dispatch => ({
       ),
     ),
 });
+//注意：connect只是一个函数，并不一定要放在export后面
 const PopularTabPage = connect(
   mapStateToProps,
   mapDispatchToProps,
