@@ -1,4 +1,9 @@
 import {AsyncStorage} from 'react-native';
+import Trending from 'GitHubTrending';
+export const FLAG_STORAGE = {
+  flag_popular: 'popular',
+  flag_trending: 'trending',
+};
 export default class DataStore {
   /**保存数据 */
   saveData(url, data, callback) {
@@ -28,26 +33,39 @@ export default class DataStore {
     });
   }
   /**获取网络数据 */
-  fetchNetData(url) {
+  fetchNetData(url, flag) {
     return new Promise((resolve, reject) => {
-      fetch(url)
-        .then(response => {
-          if (response.ok) {
-            return response.json();
-          }
-          throw new Error('Network response was not ok.');
-        })
-        .then(responseData => {
-          this.saveData(url, responseData);
-          resolve(responseData);
-        })
-        .catch(error => {
-          reject(error);
-        });
+      if (flag !== FLAG_STORAGE.flag_trending) {
+        fetch(url)
+          .then(response => {
+            if (response.ok) {
+              return response.json();
+            }
+            throw new Error('Network response was not ok.');
+          })
+          .then(responseData => {
+            this.saveData(url, responseData);
+            resolve(responseData);
+          })
+          .catch(error => {
+            reject(error);
+          });
+      } else {
+        new Trending()
+          .fetchTrending(url)
+          .then(items => {
+            if (!items) {
+              throw new Error('responseData is null');
+            }
+            this.saveData(url, items);
+            resolve(items);
+          })
+          .catch(error => reject(error));
+      }
     });
   }
   /**入口方法 离线缓存策略思想 */
-  fetchData(url) {
+  fetchData(url, flag) {
     return new Promise((resolve, reject) => {
       //先从本地获取数据
       this.fetchLocalData(url)
@@ -56,7 +74,7 @@ export default class DataStore {
             resolve(wrapData);
           } else {
             //本地数据不存在或过时，请求网络数据
-            this.fetchNetData(url)
+            this.fetchNetData(url, flag)
               .then(data => {
                 resolve(this._wrapData(data));
               })
@@ -67,7 +85,7 @@ export default class DataStore {
         })
         .catch(error => {
           //本地获取数据失败后，请求网络数据
-          this.fetchNetData(url)
+          this.fetchNetData(url, flag)
             .then(data => {
               resolve(this._wrapData(data));
             })

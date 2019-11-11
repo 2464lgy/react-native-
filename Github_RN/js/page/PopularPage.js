@@ -11,13 +11,15 @@ import {
 import {createMaterialTopTabNavigator} from 'react-navigation-tabs';
 import {createAppContainer} from 'react-navigation';
 import NavigationUtil from '../navigator/NavigationUtil';
+import DeviceInfo from 'react-native-device-info';
 import actions from '../action';
 import {connect} from 'react-redux'; //让组件和state树做关联
 import Toast from 'react-native-easy-toast';
 import PopularItem from '../common/PopularItem';
+import NavigationBar from '../common/NavigationBar';
 const URL = 'https://api.github.com/search/repositories?q=';
 const QUERY_STR = '&sort=stars';
-const THEME_COLOR = 'red';
+const THEME_COLOR = '#678';
 export default class PopularPage extends React.Component {
   constructor(props) {
     super(props);
@@ -37,6 +39,17 @@ export default class PopularPage extends React.Component {
     return tabs;
   }
   render() {
+    let statusBar = {
+      backgroundColor: THEME_COLOR,
+      barStyle: 'light-content',
+    };
+    let navigationBar = (
+      <NavigationBar
+        title={'最热'}
+        statusBar={statusBar}
+        style={{backgroundColor: THEME_COLOR}}
+      />
+    );
     const TabNavigator = createAppContainer(
       createMaterialTopTabNavigator(
         // {
@@ -62,6 +75,7 @@ export default class PopularPage extends React.Component {
             scrollEnabled: true, //是否可以滚动
             style: {
               backgroundColor: '#a67',
+              //  height: 30, //开启scrollEnabled后在android上初次加载时闪烁问题
             },
             indicatorStyle: styles.indicatorStyle,
             labelStyle: styles.labelStyle,
@@ -71,7 +85,8 @@ export default class PopularPage extends React.Component {
     );
     return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>PopularPage</Text>
+        {navigationBar}
+        {/* <Text style={styles.welcome}>PopularPage</Text> */}
         <TabNavigator />
       </View>
     );
@@ -244,6 +259,7 @@ const PopularTabPage = connect(
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginTop: DeviceInfo.getModel() === 'iPhone X' ? 30 : 0,
   },
   welcome: {
     fontSize: 20,
@@ -251,7 +267,8 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   tabStyle: {
-    minWidth: 50,
+    // minWidth: 50,
+    padding: 0,
   },
   indicatorStyle: {
     height: 2,
@@ -259,8 +276,7 @@ const styles = StyleSheet.create({
   },
   labelStyle: {
     fontSize: 13,
-    marginTop: 6,
-    marginBottom: 6,
+    margin: 0,
   },
   indicatorContainer: {
     alignItems: 'center',

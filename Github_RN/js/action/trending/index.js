@@ -5,17 +5,17 @@ import {handlerData} from '../ActionUtil';
  * 获取最热数据的异步action
  * @param {*} theme
  */
-export function onRefreshPopular(storeName, url, pageSize) {
+export function onRefreshTrending(storeName, url, pageSize) {
   //storeName 分类名称 Java/android/ios
   return dispatch => {
-    dispatch({type: Types.POPULAR_REFRESH, storeName});
+    dispatch({type: Types.TRENDING_REFRESH, storeName});
     let dataStore = new DataStore();
     //异步action与数据流
     dataStore
-      .fetchData(url, FLAG_STORAGE.flag_popular)
+      .fetchData(url, FLAG_STORAGE.flag_trending)
       .then(data => {
         handlerData(
-          Types.POPULAR_REFRESH_SUCCESS,
+          Types.TRENDING_REFRESH_SUCCESS,
           dispatch,
           storeName,
           data,
@@ -24,7 +24,7 @@ export function onRefreshPopular(storeName, url, pageSize) {
       })
       .catch(error => {
         console.log(error);
-        dispatch({type: Types.POPULAR_REFRESH_FAIL, storeName, error});
+        dispatch({type: Types.TRENDING_REFRESH_FAIL, storeName, error});
       });
   };
 }
@@ -34,7 +34,7 @@ export function onRefreshPopular(storeName, url, pageSize) {
  * @param {*} storeName
  * @param {*} data
  */
-export function onLoadMorePopular(
+export function onLoadMoreTrending(
   storeName,
   pageIndex,
   pageSize,
@@ -50,7 +50,7 @@ export function onLoadMorePopular(
         }
         //已经加载完全部数据
         dispatch({
-          type: Types.POPULAR_LOAD_MORE_FAIL,
+          type: Types.TRENDING_LOAD_MORE_FAIL,
           error: 'no more',
           storeName,
           pageIndex: --pageIndex,
@@ -63,7 +63,7 @@ export function onLoadMorePopular(
             ? dataArray.length
             : pageSize * pageIndex;
         dispatch({
-          type: Types.POPULAR_LOAD_MORE_SUCCESS,
+          type: Types.TRENDING_LOAD_MORE_SUCCESS,
           storeName,
           pageIndex,
           projectModes: dataArray.slice(0, max),
