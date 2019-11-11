@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   Button,
   RefreshControl,
+  TouchableOpacity,
 } from 'react-native';
 import {createMaterialTopTabNavigator} from 'react-navigation-tabs';
 import {createAppContainer} from 'react-navigation';
@@ -16,12 +17,17 @@ import {connect} from 'react-redux'; //让组件和state树做关联
 import Toast from 'react-native-easy-toast';
 import TrendingItem from '../common/TrendingItem';
 import NavigationBar from '../common/NavigationBar';
+import TrendingDialog, {TimeSpans} from '../common/TrendingDialog';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 const URL = 'https://github.com/trending/';
 const THEME_COLOR = '#678';
 export default class TrendingPage extends React.Component {
   constructor(props) {
     super(props);
     this.tabNames = ['Java', 'C', 'C#', 'JavaScript', 'PHP'];
+    this.state = {
+      timeSpan: TimeSpans[0],
+    };
   }
   //动态生成tab
   _genTabs() {
@@ -36,6 +42,41 @@ export default class TrendingPage extends React.Component {
     });
     return tabs;
   }
+  renderTitleView() {
+    return (
+      <View>
+        <TouchableOpacity
+          ref="button"
+          underlayColor="transparent"
+          onPress={() => this.dialog.show()}>
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <Text style={{fontSize: 18, color: '#ffffff', fontWeight: '400'}}>
+              趋势 {this.state.timeSpan.showText}
+            </Text>
+            <MaterialIcons
+              name={'arrow-drop-down'}
+              size={22}
+              style={{color: 'white'}}
+            />
+          </View>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+  onSelectTimeSpan(tab) {
+    this.dialog.dismiss();
+    this.setState({
+      timeSpan: tab,
+    });
+  }
+  renderTrendingDialog() {
+    return (
+      <TrendingDialog
+        ref={dialog => (this.dialog = dialog)}
+        onSelect={tab => this.onSelectTimeSpan(tab)}
+      />
+    );
+  }
   render() {
     let statusBar = {
       backgroundColor: THEME_COLOR,
@@ -43,7 +84,8 @@ export default class TrendingPage extends React.Component {
     };
     let navigationBar = (
       <NavigationBar
-        title={'最热'}
+        //    title={'最热'}
+        titleView={this.renderTitleView()}
         statusBar={statusBar}
         style={{backgroundColor: THEME_COLOR}}
       />
