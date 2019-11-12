@@ -88,6 +88,7 @@ export default class TrendingPage extends React.Component {
   }
   _tabNav() {
     if (!this.tabNav) {
+      //优化效率：根据需要选择是否重新创建tabNavigator
       this.tabNav = createMaterialTopTabNavigator(
         this._genTabs(), //动态生成顶部导航
         {
