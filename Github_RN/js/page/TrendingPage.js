@@ -111,6 +111,7 @@ export default class TrendingPage extends React.Component {
       <View style={styles.container}>
         {navigationBar}
         <TabNavigator />
+        {this.renderTrendingDialog()}
       </View>
     );
   }

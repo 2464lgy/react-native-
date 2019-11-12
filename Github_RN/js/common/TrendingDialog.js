@@ -3,6 +3,7 @@ import {Modal, TouchableOpacity, StyleSheet, View, Text} from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import PropTypes from 'prop-types';
 import TimeSpan from '../model/TimeSpan';
+import DeviceInfo from 'react-native-device-info';
 const NAV_BAR_HIGHT_IOS = 44; //导航栏在IOS中的高度
 const NAV_BAR_HIGHT_ANDROID = 50; //导航栏在Android中的高度
 const STATUS_BAR_HIGHT = 20; //状态栏的高度
@@ -63,10 +64,10 @@ export default class TrendingDialog extends React.Component {
                   onPress={() => onSelect(arr[i])}>
                   <View style={styles.text_container}>
                     <Text style={styles.text}>{arr[i].showText}</Text>
-                    {i !== TimeSpans.length - 1 ? (
-                      <View style={styles.line} />
-                    ) : null}
                   </View>
+                  {i !== TimeSpans.length - 1 ? (
+                    <View style={styles.line} />
+                  ) : null}
                 </TouchableOpacity>
               );
             })}
@@ -81,6 +82,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.6)',
     flex: 1,
     alignItems: 'center',
+    paddingTop: DeviceInfo.getModel() === 'iPhone X' ? 30 : 0,
   },
   arrow: {
     marginTop: 40,
