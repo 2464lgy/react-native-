@@ -15,8 +15,8 @@ const StatusBarShape = {
 };
 export const TimeSpans = [
   new TimeSpan('今天', 'since=daily'),
+  new TimeSpan('本周', 'since=weekly'),
   new TimeSpan('本月', 'since=monthly'),
-  new TimeSpan('本年', 'since=yearly'),
 ];
 export default class TrendingDialog extends React.Component {
   constructor(props) {

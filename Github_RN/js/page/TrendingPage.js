@@ -8,6 +8,7 @@ import {
   Button,
   RefreshControl,
   TouchableOpacity,
+  DeviceEventEmitter,
 } from 'react-native';
 import {createMaterialTopTabNavigator} from 'react-navigation-tabs';
 import {createAppContainer} from 'react-navigation';
@@ -21,6 +22,7 @@ import TrendingDialog, {TimeSpans} from '../common/TrendingDialog';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 const URL = 'https://github.com/trending/';
 const THEME_COLOR = '#678';
+const EVENT_TYPE_TIME_SPAN_CHANGE = 'EVENT_TYPE_TIME_SPAN_CHANGE';
 export default class TrendingPage extends React.Component {
   constructor(props) {
     super(props);
@@ -34,7 +36,13 @@ export default class TrendingPage extends React.Component {
     const tabs = {};
     this.tabNames.forEach((item, index) => {
       tabs[`tab${index}`] = {
-        screen: props => <TrendingTabPage {...this.props} tabLabel={item} />,
+        screen: props => (
+          <TrendingTabPage
+            {...this.props}
+            timeSpan={this.state.timeSpan}
+            tabLabel={item}
+          />
+        ),
         navigationOptions: {
           title: item,
         },
@@ -68,6 +76,7 @@ export default class TrendingPage extends React.Component {
     this.setState({
       timeSpan: tab,
     });
+    DeviceEventEmitter.emit(EVENT_TYPE_TIME_SPAN_CHANGE, tab);
   }
   renderTrendingDialog() {
     return (
@@ -76,6 +85,26 @@ export default class TrendingPage extends React.Component {
         onSelect={tab => this.onSelectTimeSpan(tab)}
       />
     );
+  }
+  _tabNav() {
+    if (!this.tabNav) {
+      this.tabNav = createMaterialTopTabNavigator(
+        this._genTabs(), //动态生成顶部导航
+        {
+          tabBarOptions: {
+            tabStyle: styles.tabStyle,
+            upperCaseLabel: false, //是否大写
+            scrollEnabled: true, //是否可以滚动
+            style: {
+              backgroundColor: '#a67',
+            },
+            indicatorStyle: styles.indicatorStyle,
+            labelStyle: styles.labelStyle,
+          },
+        },
+      );
+    }
+    return createAppContainer(this.tabNav);
   }
   render() {
     let statusBar = {
@@ -90,23 +119,7 @@ export default class TrendingPage extends React.Component {
         style={{backgroundColor: THEME_COLOR}}
       />
     );
-    const TabNavigator = createAppContainer(
-      createMaterialTopTabNavigator(
-        this._genTabs(), //动态生成顶部导航
-        {
-          tabBarOptions: {
-            tabStyle: styles.tabStyle,
-            upperCaseLabel: false, //是否大写
-            scrollEnabled: true, //是否可以滚动
-            style: {
-              backgroundColor: '#a67',
-            },
-            indicatorStyle: styles.indicatorStyle,
-            labelStyle: styles.labelStyle,
-          },
-        },
-      ),
-    );
+    const TabNavigator = this._tabNav();
     return (
       <View style={styles.container}>
         {navigationBar}
@@ -120,11 +133,24 @@ const pageSize = 10; //设置为常量，防止修改
 class TrendingTab extends React.Component {
   constructor(props) {
     super(props);
-    const {tabLabel} = this.props;
+    const {tabLabel, timeSpan} = this.props;
     this.storeName = tabLabel;
+    this.timeSpan = timeSpan;
   }
   componentDidMount() {
     this.loadData();
+    this.timeSpanChangeListener = DeviceEventEmitter.addListener(
+      EVENT_TYPE_TIME_SPAN_CHANGE,
+      timeSpan => {
+        this.timeSpan = timeSpan;
+        this.loadData();
+      },
+    );
+  }
+  componentWillUnmount() {
+    if (this.timeSpanChangeListener) {
+      this.timeSpanChangeListener.remove();
+    }
   }
   loadData(loadMore) {
     const store = this._store();
@@ -161,7 +187,7 @@ class TrendingTab extends React.Component {
     return store;
   }
   genFetchUrl(key) {
-    return URL + key + '?since=daily';
+    return URL + key + '?' + this.timeSpan.searchText;
   }
   renderItem(data) {
     const item = data.item;
