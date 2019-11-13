@@ -142,7 +142,12 @@ class PopularTab extends React.Component {
   renderItem(data) {
     const item = data.item;
     return (
-      <PopularItem item={item} onSelect={() => {}} />
+      <PopularItem
+        item={item}
+        onSelect={() => {
+          NavigationUtil.goPage({projectModel: item}, 'DetailPage');
+        }}
+      />
       // <View style={{marginBottom: 10}}>
       //   <Text style={{backgroundColor: '#faa'}}>{JSON.stringify(item)}</Text>
       // </View>
@@ -252,10 +257,7 @@ const mapDispatchToProps = dispatch => ({
     ),
 });
 //注意：connect只是一个函数，并不一定要放在export后面
-const PopularTabPage = connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(PopularTab);
+const PopularTabPage = connect(mapStateToProps, mapDispatchToProps)(PopularTab);
 const styles = StyleSheet.create({
   container: {
     flex: 1,

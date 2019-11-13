@@ -38,6 +38,8 @@ target 'Github_RN' do
 
   pod 'RNDeviceInfo', :path => '../node_modules/react-native-device-info'
 
+  pod 'react-native-webview', :path => '../node_modules/react-native-webview'
+
   target 'Github_RNTests' do
     inherit! :search_paths
     # Pods for testing
