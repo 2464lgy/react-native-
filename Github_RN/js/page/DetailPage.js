@@ -7,6 +7,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import WebView from 'react-native-webview';
 import NavigationUtil from '../navigator/NavigationUtil';
 import DeviceInfo from 'react-native-device-info';
+import BackPressComponent from '../common/BackPreessComponent';
 const THEME_COLOR = '#689';
 const TRENDING_URL = 'https://github.com/';
 export default class DetailPage extends React.Component {
@@ -21,6 +22,19 @@ export default class DetailPage extends React.Component {
       url: this.url,
       canGoBack: false,
     };
+    this.backPress = new BackPressComponent({
+      backPress: () => this.onBackPress(),
+    });
+  }
+  componentDidMount() {
+    this.backPress.componentDidMount();
+  }
+  componentWillUnmount() {
+    this.backPress.componentWillUnmount();
+  }
+  onBackPress() {
+    this.onBack();
+    return true;
   }
   onBack() {
     if (this.state.canGoBack) {

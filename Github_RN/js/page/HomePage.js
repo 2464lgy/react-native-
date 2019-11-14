@@ -12,6 +12,11 @@ import {createAppContainer} from 'react-navigation';
 // import Ionicons from 'react-native-vector-icons/Ionicons';
 import NavigationUtil from '../navigator/NavigationUtil';
 import DynamicTabNavigator from '../navigator/DynamicTabNavigator';
+import {NavigationActions} from 'react-navigation';
+import {connect} from 'react-redux';
+import BackPreessComponent from '../common/BackPreessComponent';
+import CustomTheme from '../page/CustomTheme';
+import actions from '../action';
 export default class HomePage extends React.Component {
   // _tabNavigator() {
   //   return createAppContainer(
@@ -69,6 +74,33 @@ export default class HomePage extends React.Component {
   //     }),
   //   );
   // }
+  constructor(props) {
+    super(props);
+    this.backPress = new BackPreessComponent({backPress: this.backPress});
+  }
+  componentDidMount() {
+    this.backPress.componentDidMount();
+  }
+  componentWillUnmount() {
+    this.backPress.componentWillUnmount();
+  }
+  /**
+    处理Android中的物理返回键
+  */
+  onBackPress = () => {
+    const {dispatch, nav} = this.props;
+    if (nav.routes[1].index === 0) {
+      //如果RootNavigator中的MainNavigator的index为0，则不处理返回事件
+      return false;
+    }
+    dispatch(NavigationActions.back());
+    return true;
+  };
+
+  renderCustomThemeView() {
+    const {customThemeViewVisible, onShowCustomThemeView} = this.props;
+    return <CustomTheme />;
+  }
 
   render() {
     //  const TabView = this._tabNavigator();
