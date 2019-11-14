@@ -6,7 +6,8 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import WebView from 'react-native-webview';
 import NavigationUtil from '../navigator/NavigationUtil';
-const THEME_COLOR = 'red';
+import DeviceInfo from 'react-native-device-info';
+const THEME_COLOR = '#689';
 const TRENDING_URL = 'https://github.com/';
 export default class DetailPage extends React.Component {
   constructor(props) {
@@ -53,10 +54,13 @@ export default class DetailPage extends React.Component {
       backgroundColor: THEME_COLOR,
       barStyle: 'light-content',
     };
+    let titleLayoutStyle =
+      this.state.title.length > 20 ? {paddingRight: 30} : null;
     let navigationBar = (
       <NavigationBar
         title={this.state.title}
         leftButton={ViewUtil.getLeftBackButton(() => this.onBack())}
+        titleLayoutStyle={titleLayoutStyle}
         statusBar={statusBar}
         style={{backgroundColor: THEME_COLOR}}
         rightButton={this.renderRightButton()}
@@ -78,14 +82,6 @@ export default class DetailPage extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f5fcff',
-  },
-
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
+    marginTop: DeviceInfo.getModel === 'iPhone X' ? 30 : 0,
   },
 });
