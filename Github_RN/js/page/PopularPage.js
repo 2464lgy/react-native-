@@ -17,9 +17,13 @@ import {connect} from 'react-redux'; //让组件和state树做关联
 import Toast from 'react-native-easy-toast';
 import PopularItem from '../common/PopularItem';
 import NavigationBar from '../common/NavigationBar';
+import {FLAG_STORAGE} from '../expand/dao/DataStore';
+import FavoriteDao from '../expand/dao/FavoriteDao';
+import FavoriteUtil from '../util/FavoriteUtil';
 const URL = 'https://api.github.com/search/repositories?q=';
 const QUERY_STR = '&sort=stars';
 const THEME_COLOR = '#678';
+const favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_popular);
 export default class PopularPage extends React.Component {
   constructor(props) {
     super(props);
@@ -112,12 +116,13 @@ class PopularTab extends React.Component {
         ++store.pageIndex,
         pageSize,
         store.items,
+        favoriteDao,
         callback => {
           this.refs.toast.show('没有更多了');
         },
       );
     } else {
-      onRefreshPopular(this.storeName, url, pageSize);
+      onRefreshPopular(this.storeName, url, pageSize, favoriteDao);
     }
   }
   /**
@@ -130,7 +135,7 @@ class PopularTab extends React.Component {
       store = {
         items: [],
         isLoading: false,
-        projectModes: [], //要显示的数据
+        projectModels: [], //要显示的数据
         hideLoadingMore: true, //默认隐藏加载更多
       };
     }
@@ -143,10 +148,18 @@ class PopularTab extends React.Component {
     const item = data.item;
     return (
       <PopularItem
-        item={item}
+        projectModel={item}
         onSelect={() => {
           NavigationUtil.goPage({projectModel: item}, 'DetailPage');
         }}
+        onFavorite={(item, isFavorite) =>
+          FavoriteUtil.onFavorite(
+            favoriteDao,
+            item,
+            isFavorite,
+            FLAG_STORAGE.flag_popular,
+          )
+        }
       />
       // <View style={{marginBottom: 10}}>
       //   <Text style={{backgroundColor: '#faa'}}>{JSON.stringify(item)}</Text>
@@ -162,23 +175,16 @@ class PopularTab extends React.Component {
     );
   }
   render() {
-    //  const {navigation} = this.props;
-    // const {tabLabel} = this.props;
-    //const {popular} = this.props;
     let store = this._store(); //popular[this.storeName]; //动态获取state
-    // if (!store) {
-    //   store = {
-    //     items: [],
-    //     isLoading: false,
-    //   };
-    // }
     return (
       <View style={styles.container}>
         {/* <Text style={styles.welcome}>{tabLabel}</Text> */}
         <FlatList
-          data={store.projectModes} //{store.items}
+          data={store.projectModels} //{store.items}
           renderItem={data => this.renderItem(data)}
-          keyExtractor={item => '' + item.id}
+          keyExtractor={item => {
+            return '' + item.item.id;
+          }}
           refreshControl={
             //下拉刷新组件
             <RefreshControl
@@ -243,15 +249,23 @@ const mapStateToProps = state => ({
   popular: state.popular,
 });
 const mapDispatchToProps = dispatch => ({
-  onRefreshPopular: (storeName, url, pageSize) =>
-    dispatch(actions.onRefreshPopular(storeName, url, pageSize)),
-  onLoadMorePopular: (storeName, pageIndex, pageSize, dataArray, callBack) =>
+  onRefreshPopular: (storeName, url, pageSize, favoriteDao) =>
+    dispatch(actions.onRefreshPopular(storeName, url, pageSize, favoriteDao)),
+  onLoadMorePopular: (
+    storeName,
+    pageIndex,
+    pageSize,
+    dataArray,
+    favoriteDao,
+    callBack,
+  ) =>
     dispatch(
       actions.onLoadMorePopular(
         storeName,
         pageIndex,
         pageSize,
         dataArray,
+        favoriteDao,
         callBack,
       ),
     ),

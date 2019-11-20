@@ -20,9 +20,13 @@ import TrendingItem from '../common/TrendingItem';
 import NavigationBar from '../common/NavigationBar';
 import TrendingDialog, {TimeSpans} from '../common/TrendingDialog';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import FavoriteUtil from '../util/FavoriteUtil';
+import FavoriteDao from '../expand/dao/FavoriteDao';
+import {FLAG_STORAGE} from '../expand/dao/DataStore';
 const URL = 'https://github.com/trending/';
 const THEME_COLOR = '#678';
 const EVENT_TYPE_TIME_SPAN_CHANGE = 'EVENT_TYPE_TIME_SPAN_CHANGE';
+const favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_trending);
 export default class TrendingPage extends React.Component {
   constructor(props) {
     super(props);
@@ -168,7 +172,7 @@ class TrendingTab extends React.Component {
         },
       );
     } else {
-      onRefreshTrending(this.storeName, url, pageSize);
+      onRefreshTrending(this.storeName, url, pageSize, favoriteDao);
     }
   }
   /**
@@ -181,7 +185,7 @@ class TrendingTab extends React.Component {
       store = {
         items: [],
         isLoading: false,
-        projectModes: [], //要显示的数据
+        projectModels: [], //要显示的数据
         hideLoadingMore: true, //默认隐藏加载更多
       };
     }
@@ -194,9 +198,17 @@ class TrendingTab extends React.Component {
     const item = data.item;
     return (
       <TrendingItem
-        item={item}
+        projectModel={item}
         onSelect={() => {
           NavigationUtil.goPage({projectModel: item}, 'DetailPage');
+        }}
+        onFavorite={(item, isFavorite) => {
+          FavoriteUtil.onFavorite(
+            favoriteDao,
+            item,
+            isFavorite,
+            FLAG_STORAGE.flag_trending,
+          );
         }}
       />
     );
@@ -211,13 +223,18 @@ class TrendingTab extends React.Component {
   }
   render() {
     let store = this._store(); //动态获取state
-
     return (
       <View style={styles.container}>
         <FlatList
-          data={store.projectModes} //{store.items}
+          data={store.projectModels} //{store.items}
           renderItem={data => this.renderItem(data)}
-          keyExtractor={item => '' + (item.id || item.fullName)}
+          keyExtractor={item => {
+            console.log(item);
+            if (item.item) {
+              return '' + item.item.fullName;
+            }
+            return '' + item.fullName;
+          }}
           refreshControl={
             //下拉刷新组件
             <RefreshControl
@@ -225,7 +242,7 @@ class TrendingTab extends React.Component {
               titleColor={THEME_COLOR}
               colors={['red', 'blue']}
               refreshing={store.isLoading}
-              onRefresh={() => this.loadData(true)}
+              onRefresh={() => this.loadData()}
               tintColor={THEME_COLOR}
             />
           }
@@ -255,15 +272,23 @@ const mapStateToProps = state => ({
   trending: state.trending,
 });
 const mapDispatchToProps = dispatch => ({
-  onRefreshTrending: (storeName, url, pageSize) =>
-    dispatch(actions.onRefreshTrending(storeName, url, pageSize)),
-  onLoadMoreTrending: (storeName, pageIndex, pageSize, dataArray, callBack) =>
+  onRefreshTrending: (storeName, url, pageSize, favoriteDao) =>
+    dispatch(actions.onRefreshTrending(storeName, url, pageSize, favoriteDao)),
+  onLoadMoreTrending: (
+    storeName,
+    pageIndex,
+    pageSize,
+    dataArray,
+    favoriteDao,
+    callBack,
+  ) =>
     dispatch(
       actions.onLoadMoreTrending(
         storeName,
         pageIndex,
         pageSize,
         dataArray,
+        favoriteDao,
         callBack,
       ),
     ),

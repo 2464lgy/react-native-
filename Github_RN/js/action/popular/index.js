@@ -1,11 +1,11 @@
 import Types from '../types';
 import DataStore, {FLAG_STORAGE} from '../../expand/dao/DataStore';
-import {handlerData} from '../ActionUtil';
+import {handlerData, _projectModels} from '../ActionUtil';
 /**
  * 获取最热数据的异步action
  * @param {*} theme
  */
-export function onRefreshPopular(storeName, url, pageSize) {
+export function onRefreshPopular(storeName, url, pageSize, favoriteDao) {
   //storeName 分类名称 Java/android/ios
   return dispatch => {
     dispatch({type: Types.POPULAR_REFRESH, storeName});
@@ -20,6 +20,7 @@ export function onRefreshPopular(storeName, url, pageSize) {
           storeName,
           data,
           pageSize,
+          favoriteDao,
         );
       })
       .catch(error => {
@@ -39,6 +40,7 @@ export function onLoadMorePopular(
   pageIndex,
   pageSize,
   dataArray = [],
+  favoriteDao,
   callBack,
 ) {
   return dispatch => {
@@ -54,7 +56,6 @@ export function onLoadMorePopular(
           error: 'no more',
           storeName,
           pageIndex: --pageIndex,
-          projectModes: dataArray,
         });
       } else {
         //本次可载入的最大数据量
@@ -62,11 +63,13 @@ export function onLoadMorePopular(
           pageSize * pageIndex > dataArray.length
             ? dataArray.length
             : pageSize * pageIndex;
-        dispatch({
-          type: Types.POPULAR_LOAD_MORE_SUCCESS,
-          storeName,
-          pageIndex,
-          projectModes: dataArray.slice(0, max),
+        _projectModels(dataArray.slice(0, max), favoriteDao, data => {
+          dispatch({
+            type: Types.POPULAR_LOAD_MORE_SUCCESS,
+            storeName,
+            pageIndex,
+            projectModels: data,
+          });
         });
       }
     }, 500);
