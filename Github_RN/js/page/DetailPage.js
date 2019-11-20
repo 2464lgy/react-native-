@@ -15,8 +15,9 @@ export default class DetailPage extends React.Component {
     super(props);
     this.params = this.props.navigation.state.params;
     const {projectModel} = this.params;
-    this.url = projectModel.html_url || TRENDING_URL + projectModel.fullName;
-    const title = projectModel.full_name || projectModel.fullName;
+    this.url =
+      projectModel.item.html_url || TRENDING_URL + projectModel.item.fullName;
+    const title = projectModel.item.full_name || projectModel.item.fullName;
     this.state = {
       title,
       url: this.url,
