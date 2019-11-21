@@ -21,6 +21,8 @@ import {FLAG_STORAGE} from '../expand/dao/DataStore';
 import FavoriteDao from '../expand/dao/FavoriteDao';
 import FavoriteUtil from '../util/FavoriteUtil';
 import TrendingItem from '../common/TrendingItem';
+import EventBus from 'react-native-event-bus';
+import EventTypes from '../util/EventTypes';
 const THEME_COLOR = '#678';
 const favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_popular);
 export default class FavoritePage extends React.Component {
@@ -91,7 +93,18 @@ class FavoriteTab extends React.Component {
     this.favoriteDao = new FavoriteDao(flag);
   }
   componentDidMount() {
-    this.loadData();
+    this.loadData(true);
+    EventBus.getInstance().addListener(
+      EventTypes.bottom_tab_select,
+      (this.listener = data => {
+        if (data.to === 2) {
+          this.loadData(false);
+        }
+      }),
+    );
+  }
+  componentWillUnmount() {
+    EventBus.getInstance().removeListener(this.listener);
   }
   loadData(isShowLoading) {
     const {onLoadFavoriteData} = this.props;
