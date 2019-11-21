@@ -7,7 +7,11 @@ export default class PopularItem extends BaseItem {
     const {item} = projectModel;
     if (!item || !item.owner) return null;
     return (
-      <TouchableOpacity onPress={this.props.onSelect}>
+      <TouchableOpacity
+        onPress={
+          () => this.onItemClick()
+          //this.props.onSelect
+        }>
         <View style={styles.cell_container}>
           <Text style={styles.title}>{item.full_name}</Text>
           <Text style={styles.description}>{item.description}</Text>

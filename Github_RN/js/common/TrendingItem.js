@@ -9,7 +9,11 @@ export default class TrendingItem extends BaseItem {
     if (!item) return null;
     let description = '<p>' + item.description + '</p>';
     return (
-      <TouchableOpacity onPress={this.props.onSelect}>
+      <TouchableOpacity
+        onPress={
+          () => this.onItemClick()
+          //this.props.onSelect
+        }>
         <View style={styles.cell_container}>
           <Text style={styles.title}>{item.fullName}</Text>
           <HTMLView
