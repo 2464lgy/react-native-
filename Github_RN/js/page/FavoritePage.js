@@ -125,6 +125,19 @@ class FavoriteTab extends React.Component {
     }
     return store;
   }
+  onFavorite(item, isFavorite) {
+    FavoriteUtil.onFavorite(
+      this.favoriteDao,
+      item,
+      isFavorite,
+      this.props.flag,
+    );
+    if (this.storeName === FLAG_STORAGE.flag_popular) {
+      EventBus.getInstance().fireEvent(EventTypes.favorite_changed_popular);
+    } else {
+      EventBus.getInstance().fireEvent(EventTypes.favoriteChanged_trending);
+    }
+  }
   renderItem(data) {
     const item = data.item;
     const Item =
@@ -138,9 +151,7 @@ class FavoriteTab extends React.Component {
             'DetailPage',
           );
         }}
-        onFavorite={(item, isFavorite) =>
-          FavoriteUtil.onFavorite(favoriteDao, item, isFavorite, this.storeName)
-        }
+        onFavorite={(item, isFavorite) => this.onFavorite(item, isFavorite)}
       />
     );
   }
