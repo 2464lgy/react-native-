@@ -4,7 +4,11 @@ import {
   onLoadMorePopular,
   onFlushPopularFavorite,
 } from './popular';
-import {onRefreshTrending, onLoadMoreTrending} from './trending';
+import {
+  onRefreshTrending,
+  onLoadMoreTrending,
+  onFlushTrendingFavorite,
+} from './trending';
 import {onLoadFavoriteData} from './favorite';
 export default {
   onThemeChange,
@@ -14,4 +18,5 @@ export default {
   onLoadMoreTrending,
   onLoadFavoriteData,
   onFlushPopularFavorite,
+  onFlushTrendingFavorite,
 };

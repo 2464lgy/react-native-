@@ -325,6 +325,7 @@ const mapDispatchToProps = dispatch => ({
     ),
 });
 //注意：connect只是一个函数，并不一定要放在export后面
+// eslint-disable-next-line prettier/prettier
 const PopularTabPage = connect(mapStateToProps, mapDispatchToProps)(PopularTab);
 const styles = StyleSheet.create({
   container: {

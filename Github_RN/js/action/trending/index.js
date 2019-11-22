@@ -75,3 +75,33 @@ export function onLoadMoreTrending(
     }, 500);
   };
 }
+/**
+ *刷新收藏状态
+ * @param {*} storeName
+ * @param {*} pageIndex
+ * @param {*} pageSize
+ * @param {*} dataArray
+ * @param {*} favoriteDao
+ */
+export function onFlushTrendingFavorite(
+  storeName,
+  pageIndex,
+  pageSize,
+  dataArray = [],
+  favoriteDao,
+) {
+  return dispatch => {
+    let max =
+      pageSize * pageIndex > dataArray.length
+        ? dataArray.length
+        : pageSize * pageIndex;
+    _projectModels(dataArray.slice(0, max), favoriteDao, data => {
+      dispatch({
+        type: Types.TRENDING_FLUSH_FAVORITE,
+        storeName,
+        pageIndex,
+        projectModels: data,
+      });
+    });
+  };
+}
