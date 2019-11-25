@@ -6,9 +6,8 @@ import {createStackNavigator} from 'react-navigation-stack';
 import WelcomePage from '../page/WelcomePage';
 import HomePage from '../page/HomePage';
 import DetailPage from '../page/DetailPage';
-import FetchDemoPage from '../page/FetchDemoPage';
-import AsyncStorageDemoPage from '../page/AsyncStorageDemoPage';
-import DataStoreDemoPage from '../page/DataStoreDemoPage';
+import WebViewPage from '../page/WebViewPage';
+import AboutPage from '../page/about/AboutPage';
 //switchNavigator 将导航切成两部分  首页之前和首页之后
 
 const IninNavigator = createStackNavigator({
@@ -32,14 +31,17 @@ const MainNavigator = createStackNavigator({
       header: null,
     },
   },
-  FetchDemoPage: {
-    screen: FetchDemoPage,
+  WebViewPage: {
+    screen: WebViewPage,
+    navigationOptions: {
+      header: null,
+    },
   },
-  AsyncStorageDemoPage: {
-    screen: AsyncStorageDemoPage,
-  },
-  DataStoreDemoPage: {
-    screen: DataStoreDemoPage,
+  AboutPage: {
+    screen: AboutPage,
+    navigationOptions: {
+      header: null,
+    },
   },
 });
 export default createAppContainer(
