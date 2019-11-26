@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  BackHandler,
   View,
   Text,
   Platform,
@@ -66,7 +65,8 @@ export default class AboutCommon {
       <View key="background">
         <Image
           source={{
-            uri: params.backgroundImg,
+            uri:
+              'https://c-ssl.duitang.com/uploads/item/201911/04/20191104143948_wjAiG.thumb.700_0.jpeg', // params.backgroundImg,
             width: window.width,
             height: PARALLAX_HEADER_HEIGHT,
           }}
@@ -98,7 +98,6 @@ export default class AboutCommon {
     //固定在顶部的内容
     config.renderFixedHeader = () => {
       <View key="fixed-header" style={styles.fixedSection}>
-        <Text>11111111</Text>
         {ViewUtil.getLeftBackButton(() =>
           NavigationUtil.goBack(this.props.navigation),
         )}

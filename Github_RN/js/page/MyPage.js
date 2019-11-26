@@ -29,6 +29,9 @@ class MyPage extends React.Component {
       case MORE_MENU.About:
         RouteName = 'AboutPage';
         break;
+      case MORE_MENU.About_Author:
+        RouteName = 'AboutMe';
+        break;
     }
     if (RouteName) {
       NavigationUtil.goPage(params, RouteName);

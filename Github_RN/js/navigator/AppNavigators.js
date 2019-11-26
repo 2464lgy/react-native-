@@ -8,6 +8,7 @@ import HomePage from '../page/HomePage';
 import DetailPage from '../page/DetailPage';
 import WebViewPage from '../page/WebViewPage';
 import AboutPage from '../page/about/AboutPage';
+import AboutMe from '../page/about/AboutMePage';
 //switchNavigator 将导航切成两部分  首页之前和首页之后
 
 const IninNavigator = createStackNavigator({
@@ -39,6 +40,12 @@ const MainNavigator = createStackNavigator({
   },
   AboutPage: {
     screen: AboutPage,
+    navigationOptions: {
+      header: null,
+    },
+  },
+  AboutMe: {
+    screen: AboutMe,
     navigationOptions: {
       header: null,
     },

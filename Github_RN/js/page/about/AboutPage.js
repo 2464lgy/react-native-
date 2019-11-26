@@ -6,6 +6,7 @@ import {
   Button,
   TouchableOpacity,
   ScrollView,
+  Linking,
 } from 'react-native';
 import {connect} from 'react-redux';
 import actions from '../../action';
@@ -24,7 +25,7 @@ export default class AboutPage extends React.Component {
       {
         ...this.params,
         navigation: this.props.navigation,
-        flagAbout: FLAG_ABOUT.flag_about_me,
+        flagAbout: FLAG_ABOUT.flag_about,
       },
       data => this.setState({...data}),
     );
@@ -38,6 +39,23 @@ export default class AboutPage extends React.Component {
         RouteName = 'WebViewPage';
         params.title = '教程';
         params.url = 'https://coding.m.imooc.com/classindex.html?cid=89';
+        break;
+      case MORE_MENU.About_Author:
+        RouteName = 'AboutMe';
+        break;
+      case MORE_MENU.Feedback:
+        const url = 'mailto://1748168436@qq.com';
+        Linking.canOpenURL(url)
+          .then(support => {
+            if (!support) {
+              console.log("Can't handle url: " + url);
+            } else {
+              Linking.openURL(url);
+            }
+          })
+          .catch(e => {
+            console.log('An error occurred', e);
+          });
         break;
     }
     if (RouteName) {
