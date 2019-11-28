@@ -25,34 +25,42 @@ import FavoriteDao from '../expand/dao/FavoriteDao';
 import {FLAG_STORAGE} from '../expand/dao/DataStore';
 import EventBus from 'react-native-event-bus';
 import EventTypes from '../util/EventTypes';
+import {FLAG_LANGUAGE} from '../expand/dao/LanguageDao';
+import ArrayUtil from '../util/ArrayUtil';
 const URL = 'https://github.com/trending/';
 const THEME_COLOR = '#678';
 const EVENT_TYPE_TIME_SPAN_CHANGE = 'EVENT_TYPE_TIME_SPAN_CHANGE';
 const favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_trending);
-export default class TrendingPage extends React.Component {
+class TrendingPage extends React.Component {
   constructor(props) {
     super(props);
-    this.tabNames = ['Java', 'C', 'C#', 'JavaScript', 'PHP'];
     this.state = {
       timeSpan: TimeSpans[0],
     };
+    const {onLoadLanguage} = this.props;
+    onLoadLanguage(FLAG_LANGUAGE.flag_language);
+    this.preKeys = [];
   }
   //动态生成tab
   _genTabs() {
     const tabs = {};
-    this.tabNames.forEach((item, index) => {
-      tabs[`tab${index}`] = {
-        screen: props => (
-          <TrendingTabPage
-            {...this.props}
-            timeSpan={this.state.timeSpan}
-            tabLabel={item}
-          />
-        ),
-        navigationOptions: {
-          title: item,
-        },
-      };
+    const {keys} = this.props;
+    this.preKeys = keys;
+    keys.forEach((item, index) => {
+      if (item.checked) {
+        tabs[`tab${index}`] = {
+          screen: props => (
+            <TrendingTabPage
+              {...this.props}
+              timeSpan={this.state.timeSpan}
+              tabLabel={item.name}
+            />
+          ),
+          navigationOptions: {
+            title: item.name,
+          },
+        };
+      }
     });
     return tabs;
   }
@@ -93,7 +101,7 @@ export default class TrendingPage extends React.Component {
     );
   }
   _tabNav() {
-    if (!this.tabNav) {
+    if (!this.tabNav || !ArrayUtil.isEqual(this.preKeys, this.props.keys)) {
       //优化效率：根据需要选择是否重新创建tabNavigator
       this.tabNav = createMaterialTopTabNavigator(
         this._genTabs(), //动态生成顶部导航
@@ -114,6 +122,7 @@ export default class TrendingPage extends React.Component {
     return createAppContainer(this.tabNav);
   }
   render() {
+    const {keys} = this.props;
     let statusBar = {
       backgroundColor: THEME_COLOR,
       barStyle: 'light-content',
@@ -126,16 +135,27 @@ export default class TrendingPage extends React.Component {
         style={{backgroundColor: THEME_COLOR}}
       />
     );
-    const TabNavigator = this._tabNav();
+    const TabNavigator = keys.length ? this._tabNav() : null;
     return (
       <View style={styles.container}>
         {navigationBar}
-        <TabNavigator />
+        {TabNavigator && <TabNavigator />}
         {this.renderTrendingDialog()}
       </View>
     );
   }
 }
+
+const mapTrenderingStateToProps = state => ({
+  keys: state.language.languages,
+});
+const mapTrendingDispatchToProps = dispatch => ({
+  onLoadLanguage: flag => dispatch(actions.onLoadLanguage(flag)),
+});
+export default connect(
+  mapTrenderingStateToProps,
+  mapTrendingDispatchToProps,
+)(TrendingPage);
 const pageSize = 10; //设置为常量，防止修改
 class TrendingTab extends React.Component {
   constructor(props) {

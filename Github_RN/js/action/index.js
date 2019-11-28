@@ -10,6 +10,7 @@ import {
   onFlushTrendingFavorite,
 } from './trending';
 import {onLoadFavoriteData} from './favorite';
+import {onLoadLanguage} from './language';
 export default {
   onThemeChange,
   onRefreshPopular,
@@ -19,4 +20,5 @@ export default {
   onLoadFavoriteData,
   onFlushPopularFavorite,
   onFlushTrendingFavorite,
+  onLoadLanguage,
 };
