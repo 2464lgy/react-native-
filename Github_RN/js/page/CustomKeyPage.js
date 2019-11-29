@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, StyleSheet, ScrollView} from 'react-native';
+import {View, StyleSheet, ScrollView, Alert} from 'react-native';
 import actions from '../action';
 import {connect} from 'react-redux'; //让组件和state树做关联
 import NavigationBar from '../common/NavigationBar';
@@ -9,6 +9,7 @@ import Checkbox from 'react-native-check-box';
 import ViewUtil from '../util/ViewUtil';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import NavigationUtil from '../navigator/NavigationUtil';
+import ArrayUtil from '../util/ArrayUtil';
 const THEME_COLOR = '#678';
 class CustomKeyPage extends React.Component {
   constructor(props) {
@@ -65,7 +66,18 @@ class CustomKeyPage extends React.Component {
     this.onBack();
     return true;
   }
-  onSave() {}
+  onSave() {
+    if (this.changeValues.length === 0) {
+      NavigationUtil.goBack(this.props.navigation);
+      return;
+    }
+    //更新本地数据
+    this.languageDao.save(this.state.keys);
+    const {onLoadLanguage} = this.props;
+    //更新store
+    onLoadLanguage(this.params.flag);
+    NavigationUtil.goBack(this.props.navigation);
+  }
   renderView() {
     let dataArray = this.state.keys;
     if (!dataArray || dataArray.length === 0) return;
@@ -84,9 +96,33 @@ class CustomKeyPage extends React.Component {
     }
     return views;
   }
-  onClick(data, index) {}
+  onClick(data, index) {
+    data.checked = !data.checked;
+    ArrayUtil.updateArray(this.changeValues, data);
+    this.state.keys[index] = data;
+    this.setState({
+      keys: this.state.keys,
+    });
+  }
   onBack() {
-    NavigationUtil.goBack(this.props.navigation);
+    if (this.changeValues.length > 0) {
+      Alert.alert('提示', '是否要保存修改？', [
+        {
+          text: '否',
+          onPress: () => {
+            NavigationUtil.goBack(this.props.navigation);
+          },
+        },
+        {
+          text: '是',
+          onPress: () => {
+            this.onSave();
+          },
+        },
+      ]);
+    } else {
+      NavigationUtil.goBack(this.props.navigation);
+    }
   }
   _checkedImage(checked) {
     const {theme} = this.params;
