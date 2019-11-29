@@ -103,7 +103,7 @@ class CustomKeyPage extends React.Component {
       <Checkbox
         style={{flex: 1, padding: 10}}
         onClick={() => this.onClick(data, index)}
-        isChecked={data.isChecked}
+        isChecked={data.checked}
         leftText={data.name}
         checkedImage={this._checkedImage(true)}
         unCheckedImage={this._checkedImage(false)}

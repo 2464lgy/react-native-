@@ -19,7 +19,7 @@ export const MORE_MENU = {
     icon: 'ios-color-palette',
   },
   Custom_Key: {
-    name: '标签排序',
+    name: '自定义标签',
     Icons: MaterialCommunityIcons,
     icon: 'sort',
   },
