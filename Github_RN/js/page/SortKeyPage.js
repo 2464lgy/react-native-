@@ -33,7 +33,7 @@ class SortKeyPage extends React.Component {
     };
   }
   static getDerivedStateFromProps(nextProps, prevState) {
-    const checkedArray = SortKeyPage._keys(nextProps, null, prevState);
+    const checkedArray = SortKeyPage._keys(nextProps, prevState);
     if (prevState.keys !== checkedArray) {
       return {
         checkedArray: checkedArray,
