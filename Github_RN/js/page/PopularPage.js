@@ -81,6 +81,7 @@ class PopularPage extends React.Component {
                 indicatorStyle: styles.indicatorStyle,
                 labelStyle: styles.labelStyle,
               },
+              lazy: true, //懒加载启用后popularTab每次只会渲染一个tab
             },
           ),
         )

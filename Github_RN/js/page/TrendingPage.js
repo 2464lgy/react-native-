@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {lazy} from 'react';
 import {
   View,
   FlatList,
@@ -116,6 +116,7 @@ class TrendingPage extends React.Component {
             indicatorStyle: styles.indicatorStyle,
             labelStyle: styles.labelStyle,
           },
+          lazy: true,
         },
       );
     }

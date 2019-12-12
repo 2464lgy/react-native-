@@ -58,6 +58,17 @@ class CustomKeyPage extends React.Component {
     const {flag, isRemoveKey} = props.navigation.state.params;
     let key = flag === FLAG_LANGUAGE.flag_key ? 'keys' : 'languages';
     if (isRemoveKey && !original) {
+      //如果state中的keys为空则从props中取
+      return (
+        (state && state.keys && state.keys.length !== 0 && state.keys) ||
+        props.language[key].map(val => {
+          return {
+            //注意这里不直接修改props，而是copy一份
+            ...val,
+            checked: false,
+          };
+        })
+      );
     } else {
       return props.language[key];
     }
@@ -71,8 +82,19 @@ class CustomKeyPage extends React.Component {
       NavigationUtil.goBack(this.props.navigation);
       return;
     }
+    let keys; //用来保存移除之后的结果
+    if (this.isRemoveKey) {
+      //如果是标签移除，需要特殊处理
+      for (let i = 0, l = this.changeValues.length; i < l; i++) {
+        ArrayUtil.remove(
+          (keys = CustomKeyPage._keys(this.props, true)),
+          this.changeValues[i],
+          'name',
+        );
+      }
+    }
     //更新本地数据
-    this.languageDao.save(this.state.keys);
+    this.languageDao.save(keys || this.state.keys);
     const {onLoadLanguage} = this.props;
     //更新store
     onLoadLanguage(this.params.flag);
@@ -99,7 +121,7 @@ class CustomKeyPage extends React.Component {
   onClick(data, index) {
     data.checked = !data.checked;
     ArrayUtil.updateArray(this.changeValues, data);
-    this.state.keys[index] = data;
+    this.state.keys[index] = data; //更新state以便显示选中状态
     this.setState({
       keys: this.state.keys,
     });

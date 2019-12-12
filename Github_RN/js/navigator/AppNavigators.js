@@ -10,6 +10,7 @@ import WebViewPage from '../page/WebViewPage';
 import AboutPage from '../page/about/AboutPage';
 import AboutMe from '../page/about/AboutMePage';
 import CustomKeyPage from '../page/CustomKeyPage';
+import SortKeyPage from '../page/SortKeyPage';
 //switchNavigator 将导航切成两部分  首页之前和首页之后
 
 const IninNavigator = createStackNavigator({
@@ -53,6 +54,12 @@ const MainNavigator = createStackNavigator({
   },
   CustomKeyPage: {
     screen: CustomKeyPage,
+    navigationOptions: {
+      header: null,
+    },
+  },
+  SortKeyPage: {
+    screen: SortKeyPage,
     navigationOptions: {
       header: null,
     },

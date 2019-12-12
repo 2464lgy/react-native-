@@ -33,6 +33,14 @@ class MyPage extends React.Component {
       case MORE_MENU.About_Author:
         RouteName = 'AboutMe';
         break;
+      case MORE_MENU.Sort_Key:
+        RouteName = 'SortKeyPage';
+        params.flag = FLAG_LANGUAGE.flag_key;
+        break;
+      case MORE_MENU.Sort_Language:
+        RouteName = 'SortKeyPage';
+        params.flag = FLAG_LANGUAGE.flag_language;
+        break;
       case MORE_MENU.Custom_Language:
       case MORE_MENU.Custom_Key:
       case MORE_MENU.Remove_Key:
@@ -42,6 +50,7 @@ class MyPage extends React.Component {
           menu !== MORE_MENU.Custom_Language
             ? FLAG_LANGUAGE.flag_key
             : FLAG_LANGUAGE.flag_language;
+
         break;
     }
     if (RouteName) {
