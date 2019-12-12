@@ -29,7 +29,7 @@ class SortKeyPage extends React.Component {
     });
     this.languageDao = new LanguageDao(this.params.flag);
     this.state = {
-      checkedArray: SortKeyPage._keys(this.props),
+      checkedArray: SortKeyPage._keys(this.props), //筛选出选中的数据
     };
   }
   static getDerivedStateFromProps(nextProps, prevState) {
@@ -166,6 +166,7 @@ class SortKeyPage extends React.Component {
           data={this.state.checkedArray}
           order={Object.keys(this.state.checkedArray)}
           onRowMoved={e => {
+            //拖拽时触发
             this.state.checkedArray.splice(
               e.to,
               0,

@@ -11,6 +11,7 @@ import AboutPage from '../page/about/AboutPage';
 import AboutMe from '../page/about/AboutMePage';
 import CustomKeyPage from '../page/CustomKeyPage';
 import SortKeyPage from '../page/SortKeyPage';
+import CustomTheme from '../page/CustomTheme';
 //switchNavigator 将导航切成两部分  首页之前和首页之后
 
 const IninNavigator = createStackNavigator({
@@ -60,6 +61,12 @@ const MainNavigator = createStackNavigator({
   },
   SortKeyPage: {
     screen: SortKeyPage,
+    navigationOptions: {
+      header: null,
+    },
+  },
+  CustomTheme: {
+    screen: CustomTheme,
     navigationOptions: {
       header: null,
     },

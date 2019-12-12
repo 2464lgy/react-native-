@@ -41,6 +41,9 @@ class MyPage extends React.Component {
         RouteName = 'SortKeyPage';
         params.flag = FLAG_LANGUAGE.flag_language;
         break;
+      case MORE_MENU.Custom_Theme:
+        RouteName = 'CustomTheme';
+        break;
       case MORE_MENU.Custom_Language:
       case MORE_MENU.Custom_Key:
       case MORE_MENU.Remove_Key:

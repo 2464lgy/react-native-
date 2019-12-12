@@ -99,7 +99,13 @@ export default class HomePage extends React.Component {
 
   renderCustomThemeView() {
     const {customThemeViewVisible, onShowCustomThemeView} = this.props;
-    return <CustomTheme />;
+    return (
+      <CustomTheme
+        visible={customThemeViewVisible}
+        {...this.props}
+        onClose={() => onShowCustomThemeView(false)}
+      />
+    );
   }
 
   render() {
