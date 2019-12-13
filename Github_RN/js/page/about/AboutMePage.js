@@ -19,7 +19,6 @@ import config from '../../res/data/config.json';
 import GlobalStyles from '../../res/styles/GlobalStyles';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Toast from 'react-native-easy-toast';
-const THEME_COLOR = '#678';
 export default class AboutMePage extends React.Component {
   constructor(props) {
     super(props);
@@ -71,7 +70,11 @@ export default class AboutMePage extends React.Component {
     }
   }
   getItem(menu) {
-    return ViewUtil.getMenuItem(() => this.onClick(menu), menu, THEME_COLOR);
+    return ViewUtil.getMenuItem(
+      () => this.onClick(menu),
+      menu,
+      this.params.theme.themeColor,
+    );
   }
   _item(data, isShow, key) {
     return ViewUtil.getSettingItem(
@@ -81,7 +84,7 @@ export default class AboutMePage extends React.Component {
         });
       },
       data.name,
-      THEME_COLOR,
+      this.params.theme,
       Ionicons,
       data.icon,
       isShow ? 'ios-arrow-up' : 'ios-arrow-down',
@@ -104,7 +107,7 @@ export default class AboutMePage extends React.Component {
           {ViewUtil.getSettingItem(
             () => this.onClick(dic[i]),
             title,
-            THEME_COLOR,
+            this.params.theme.themeColor,
           )}
           <View style={GlobalStyles.line} />
         </View>,

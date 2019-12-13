@@ -16,7 +16,6 @@ import ViewUtil from '../../util/ViewUtil';
 import AboutCommon, {FLAG_ABOUT} from './AboutCommon';
 import config from '../../res/data/config.json';
 import GlobalStyles from '../../res/styles/GlobalStyles';
-const THEME_COLOR = '#678';
 export default class AboutPage extends React.Component {
   constructor(props) {
     super(props);
@@ -33,7 +32,7 @@ export default class AboutPage extends React.Component {
   }
   onClick(menu) {
     let RouteName,
-      params = {};
+      params = {theme: this.params.theme.themeColor};
     switch (menu) {
       case MORE_MENU.Tutorial:
         RouteName = 'WebViewPage';
@@ -63,7 +62,11 @@ export default class AboutPage extends React.Component {
     }
   }
   getItem(menu) {
-    return ViewUtil.getMenuItem(() => this.onClick(menu), menu, THEME_COLOR);
+    return ViewUtil.getMenuItem(
+      () => this.onClick(menu),
+      menu,
+      this.params.theme.themeColor,
+    );
   }
   render() {
     const content = (

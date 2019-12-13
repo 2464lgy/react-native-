@@ -98,7 +98,7 @@ export default class DetailPage extends React.Component {
         leftButton={ViewUtil.getLeftBackButton(() => this.onBack())}
         titleLayoutStyle={titleLayoutStyle}
         statusBar={statusBar}
-        style={{backgroundColor: theme ? theme.themeColor : THEME_COLOR}}
+        style={theme.styles.navBar}
         rightButton={this.renderRightButton()}
       />
     );

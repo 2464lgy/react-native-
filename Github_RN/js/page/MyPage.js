@@ -19,7 +19,9 @@ import {FLAG_LANGUAGE} from '../expand/dao/LanguageDao';
 class MyPage extends React.Component {
   onClick(menu) {
     let RouteName,
-      params = {};
+      params = {
+        theme: this.props.theme,
+      };
     switch (menu) {
       case MORE_MENU.Tutorial:
         RouteName = 'WebViewPage';

@@ -19,7 +19,6 @@ import NavigationUtil from '../navigator/NavigationUtil';
 import ArrayUtil from '../util/ArrayUtil';
 import SortableListView from 'react-native-sortable-listview';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-const THEME_COLOR = '#678';
 class SortKeyPage extends React.Component {
   constructor(props) {
     super(props);
@@ -155,7 +154,7 @@ class SortKeyPage extends React.Component {
       <NavigationBar
         title={title}
         leftButton={ViewUtil.getLeftBackButton(() => this.onBack())}
-        style={{backgroundColor: THEME_COLOR}}
+        style={{backgroundColor: this.params.theme.themeColor}}
         rightButton={ViewUtil.getRightButton('保存', () => this.onSave())}
       />
     );
@@ -192,7 +191,7 @@ class SortCell extends React.Component {
           <MaterialCommunityIcons
             name={'sort'}
             size={16}
-            style={{marginRight: 10, color: THEME_COLOR}}
+            style={{marginRight: 10, color: this.params.theme.themeColor}}
           />
           <Text>{this.props.data.name}</Text>
         </View>

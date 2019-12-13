@@ -10,7 +10,6 @@ import ViewUtil from '../util/ViewUtil';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import NavigationUtil from '../navigator/NavigationUtil';
 import ArrayUtil from '../util/ArrayUtil';
-const THEME_COLOR = '#678';
 class CustomKeyPage extends React.Component {
   constructor(props) {
     super(props);
@@ -107,7 +106,7 @@ class CustomKeyPage extends React.Component {
     let views = [];
     for (let i = 0, l = len; i < l; i += 2) {
       views.push(
-        <View keys={i}>
+        <View key={i}>
           <View style={styles.item}>
             {this.renderCheckBox(dataArray[i], i)}
             {i + 1 < len && this.renderCheckBox(dataArray[i + 1], i + 1)}
@@ -152,7 +151,7 @@ class CustomKeyPage extends React.Component {
       <Ionicons
         name={checked ? 'ios-checkbox' : 'md-square-outline'}
         size={20}
-        style={{color: THEME_COLOR}}
+        style={{color: this.params.theme.themeColor}}
       />
     );
   }
@@ -177,7 +176,7 @@ class CustomKeyPage extends React.Component {
       <NavigationBar
         title={title}
         leftButton={ViewUtil.getLeftBackButton(() => this.onBack())}
-        style={{backgroundColor: THEME_COLOR}}
+        style={{backgroundColor: this.params.theme.themeColor}}
         rightButton={ViewUtil.getRightButton(rightButtonTitle, () =>
           this.onSave(),
         )}
