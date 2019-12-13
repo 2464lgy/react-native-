@@ -173,7 +173,9 @@ class SortKeyPage extends React.Component {
             );
             this.forceUpdate();
           }}
-          renderRow={row => <SortCell data={row} {...this.params} />}
+          renderRow={row => (
+            <SortCell data={row} {...this.params} theme={theme} />
+          )}
         />
       </View>
     );
