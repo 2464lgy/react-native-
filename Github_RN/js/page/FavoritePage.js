@@ -160,7 +160,7 @@ class FavoriteTab extends React.Component {
         projectModel={item}
         onSelect={callback => {
           NavigationUtil.goPage(
-            {projectModel: item, flag: this.storeName, callback},
+            {projectModel: item, flag: this.storeName, callback, theme},
             'DetailPage',
           );
         }}

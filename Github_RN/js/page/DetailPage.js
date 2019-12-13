@@ -85,8 +85,9 @@ export default class DetailPage extends React.Component {
     });
   }
   render() {
+    const {theme} = this.params;
     let statusBar = {
-      backgroundColor: THEME_COLOR,
+      backgroundColor: theme ? theme.themeColor : THEME_COLOR,
       barStyle: 'light-content',
     };
     let titleLayoutStyle =
@@ -97,7 +98,7 @@ export default class DetailPage extends React.Component {
         leftButton={ViewUtil.getLeftBackButton(() => this.onBack())}
         titleLayoutStyle={titleLayoutStyle}
         statusBar={statusBar}
-        style={{backgroundColor: THEME_COLOR}}
+        style={{backgroundColor: theme ? theme.themeColor : THEME_COLOR}}
         rightButton={this.renderRightButton()}
       />
     );

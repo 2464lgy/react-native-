@@ -200,7 +200,12 @@ class PopularTab extends React.Component {
         theme={theme}
         onSelect={callback => {
           NavigationUtil.goPage(
-            {projectModel: item, flag: FLAG_STORAGE.flag_popular, callback},
+            {
+              projectModel: item,
+              flag: FLAG_STORAGE.flag_popular,
+              callback,
+              theme,
+            },
             'DetailPage',
           );
         }}

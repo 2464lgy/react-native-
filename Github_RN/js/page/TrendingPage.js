@@ -263,7 +263,12 @@ class TrendingTab extends React.Component {
         theme={theme}
         onSelect={callback => {
           NavigationUtil.goPage(
-            {projectModel: item, flag: FLAG_STORAGE.flag_trending, callback},
+            {
+              projectModel: item,
+              flag: FLAG_STORAGE.flag_trending,
+              callback,
+              theme,
+            },
             'DetailPage',
           );
         }}
