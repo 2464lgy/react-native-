@@ -42,7 +42,8 @@ class MyPage extends React.Component {
         params.flag = FLAG_LANGUAGE.flag_language;
         break;
       case MORE_MENU.Custom_Theme:
-        RouteName = 'CustomTheme';
+        const {onShowCustomThemeView} = this.props;
+        onShowCustomThemeView(true);
         break;
       case MORE_MENU.Custom_Language:
       case MORE_MENU.Custom_Key:
@@ -164,7 +165,10 @@ const styles = StyleSheet.create({
     color: 'gray',
   },
 });
-const mapDispatchTopProps = dispatch => ({
-  onThemeChange: theme => dispatch(actions.onThemeChange(theme)),
+const mapStateToProps = state => ({
+  theme: state.theme.theme,
 });
-export default connect(null, mapDispatchTopProps)(MyPage);
+const mapDispatchTopProps = dispatch => ({
+  onShowCustomThemeView: show => dispatch(actions.onShowCustomThemeView(show)),
+});
+export default connect(mapStateToProps, mapDispatchTopProps)(MyPage);

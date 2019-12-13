@@ -32,7 +32,8 @@ class CustomTheme extends Component {
         style={{flex: 1}}
         underlayColor="white"
         onPress={() => this.onSelectTheme(themeKey)}>
-        <View style={[{backgroundColor: ThemeFlags[themeKey]}, styles.theme]}>
+        <View
+          style={[{backgroundColor: ThemeFlags[themeKey]}, styles.themeItem]}>
           <Text style={styles.themeText}>{themeKey}</Text>
         </View>
       </TouchableHighlight>
@@ -76,7 +77,7 @@ class CustomTheme extends Component {
   render() {
     let view = this.props.visible ? (
       <View style={GlobalStyles.root_container}>
-        <Text>{this.renderContentView()}</Text>
+        {this.renderContentView()}
       </View>
     ) : null;
     return view;

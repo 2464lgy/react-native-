@@ -17,7 +17,7 @@ import {connect} from 'react-redux';
 import BackPreessComponent from '../common/BackPreessComponent';
 import CustomTheme from '../page/CustomTheme';
 import actions from '../action';
-export default class HomePage extends React.Component {
+class HomePage extends React.Component {
   // _tabNavigator() {
   //   return createAppContainer(
   //     createBottomTabNavigator({
@@ -113,13 +113,22 @@ export default class HomePage extends React.Component {
     //FIX DynamicTabNavigator中的页面无法跳转到最外层导航器页面的问题。
     NavigationUtil.navigation = this.props.navigation;
     return (
-      // <View style={styles.container}>
-      //   <Text style={styles.welcome}>HomePage</Text>
-      // </View>
-      <DynamicTabNavigator />
+      <View style={{flex: 1}}>
+        <DynamicTabNavigator />
+        {this.renderCustomThemeView()}
+      </View>
     );
   }
 }
+const mapStateToProps = state => ({
+  nav: state.nav,
+  customThemeViewVisible: state.theme.customThemeViewVisible,
+  theme: state.theme.theme,
+});
+const mapDispatchToProps = dispatch => ({
+  onShowCustomThemeView: show => dispatch(actions.onShowCustomThemeView(show)),
+});
+export default connect(mapStateToProps, mapDispatchToProps)(HomePage);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
