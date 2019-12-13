@@ -25,7 +25,6 @@ import EventTypes from '../util/EventTypes';
 import {FLAG_LANGUAGE} from '../expand/dao/LanguageDao';
 const URL = 'https://api.github.com/search/repositories?q=';
 const QUERY_STR = '&sort=stars';
-const THEME_COLOR = '#678';
 const favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_popular);
 class PopularPage extends React.Component {
   constructor(props) {
@@ -37,12 +36,16 @@ class PopularPage extends React.Component {
   //动态生成tab
   _genTabs() {
     const tabs = {};
-    const {keys} = this.props;
+    const {keys, theme} = this.props;
     keys.forEach((item, index) => {
       if (item.checked) {
         tabs[`tab${index}`] = {
           screen: props => (
-            <PopularTabPage {...this.props} tabLabel={item.name} />
+            <PopularTabPage
+              {...this.props}
+              tabLabel={item.name}
+              theme={theme}
+            />
           ),
           navigationOptions: {
             title: item.name,
@@ -53,16 +56,16 @@ class PopularPage extends React.Component {
     return tabs;
   }
   render() {
-    const {keys} = this.props;
+    const {keys, theme} = this.props;
     let statusBar = {
-      backgroundColor: THEME_COLOR,
+      backgroundColor: theme.themeColor,
       barStyle: 'light-content',
     };
     let navigationBar = (
       <NavigationBar
         title={'最热'}
         statusBar={statusBar}
-        style={{backgroundColor: THEME_COLOR}}
+        style={theme.styles.navBar}
       />
     );
     const TabNavigator = keys.length
@@ -75,7 +78,7 @@ class PopularPage extends React.Component {
                 upperCaseLabel: false, //是否大写
                 scrollEnabled: true, //是否可以滚动
                 style: {
-                  backgroundColor: '#a67',
+                  backgroundColor: theme.themeColor,
                   //  height: 30, //开启scrollEnabled后在android上初次加载时闪烁问题
                 },
                 indicatorStyle: styles.indicatorStyle,
@@ -97,6 +100,7 @@ class PopularPage extends React.Component {
 }
 const mapPopularStateToProps = state => ({
   keys: state.language.keys,
+  theme: state.theme.theme, //订阅theme
 });
 const mapPopularDispatchToProps = dispatch => ({
   onLoadLanguage: flag => dispatch(actions.onLoadLanguage(flag)),
@@ -189,9 +193,11 @@ class PopularTab extends React.Component {
   }
   renderItem(data) {
     const item = data.item;
+    const {theme} = this.props;
     return (
       <PopularItem
         projectModel={item}
+        theme={theme}
         onSelect={callback => {
           NavigationUtil.goPage(
             {projectModel: item, flag: FLAG_STORAGE.flag_popular, callback},
@@ -221,6 +227,7 @@ class PopularTab extends React.Component {
     );
   }
   render() {
+    let {theme} = this.props;
     let store = this._store(); //popular[this.storeName]; //动态获取state
     return (
       <View style={styles.container}>
@@ -235,11 +242,11 @@ class PopularTab extends React.Component {
             //下拉刷新组件
             <RefreshControl
               title={'loading'}
-              titleColor={THEME_COLOR}
-              colors={['red', 'blue']}
+              titleColor={theme.themeColor}
+              colors={[theme.themeColor]}
               refreshing={store.isLoading}
               onRefresh={() => this.loadData(true)}
-              tintColor={THEME_COLOR}
+              tintColor={theme.themeColor}
             />
           }
           ListFooterComponent={() => this.genIndicator()}
@@ -262,33 +269,6 @@ class PopularTab extends React.Component {
         <Toast ref={'toast'} position={'center'} />
       </View>
     );
-    // return (
-    //   <View style={styles.container}>
-    //     <Text>PopularTab</Text>
-    //     <Text
-    //       onPress={() => {
-    //         NavigationUtil.goPage({}, 'DetailPage');
-    //       }}>
-    //       跳转到详情页
-    //     </Text>
-
-    //     {/**
-    //         Button 点击事件 下面的方法无效啊
-    //       */}
-    //     <Button
-    //       title={'修改主题'}
-    //       onPress={() => {
-    //         // navigation.setParams({
-    //         //   theme: {
-    //         //     tintColor: 'yellow',
-    //         //     updateTime: new Date().getTime(),
-    //         //   },
-    //         // });
-    //         this.props.onThemeChange('yellow');
-    //       }}
-    //     />
-    //   </View>
-    // );
   }
 }
 const mapStateToProps = state => ({
@@ -365,10 +345,3 @@ const styles = StyleSheet.create({
     margin: 10,
   },
 });
-// const mapDispatchToProps = dispatch => ({
-//   onThemeChange: theme => dispatch(actions.onThemeChange(theme)),
-// });
-// export default connect(
-//   null,
-//   mapDispatchToProps,
-// )(PopularPage);

@@ -45,6 +45,7 @@ export default class BaseItem extends React.Component {
     this.props.onFavorite(this.props.projectModel.item, !this.state.isFavorite);
   }
   _favoriteIcon() {
+    const {theme} = this.props;
     return (
       <TouchableOpacity
         style={{padding: 6}}
@@ -53,7 +54,7 @@ export default class BaseItem extends React.Component {
         <FontAwesome
           name={this.state.isFavorite ? 'star' : 'star-o'}
           size={26}
-          style={{color: '#678'}}
+          style={{color: theme.themeColor}}
         />
       </TouchableOpacity>
     );

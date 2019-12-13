@@ -16,7 +16,6 @@ import {MORE_MENU} from '../common/MORE_MENU';
 import GlobalStyles from '../res/styles/GlobalStyles';
 import ViewUtil from '../util/ViewUtil';
 import {FLAG_LANGUAGE} from '../expand/dao/LanguageDao';
-const THEME_COLOR = '#678';
 class MyPage extends React.Component {
   onClick(menu) {
     let RouteName,
@@ -62,18 +61,25 @@ class MyPage extends React.Component {
     }
   }
   getItem(menu) {
-    return ViewUtil.getMenuItem(() => this.onClick(menu), menu, THEME_COLOR);
+    const {theme} = this.props;
+    return ViewUtil.getMenuItem(
+      () => this.onClick(menu),
+      menu,
+      theme.themeColor,
+    );
   }
   render() {
+    const {theme} = this.props;
+    console.log(theme);
     let statusBar = {
-      backgroundColor: THEME_COLOR,
+      backgroundColor: theme.themeColor,
       barStyle: 'light-content',
     };
     let navigationBar = (
       <NavigationBar
         title={'我的'}
         statusBar={statusBar}
-        style={{backgroundColor: THEME_COLOR}}
+        style={theme.styles.navBar}
       />
     );
     return (
@@ -87,7 +93,7 @@ class MyPage extends React.Component {
               <Ionicons
                 name={MORE_MENU.About.icon}
                 size={40}
-                style={{marginRight: 10, color: THEME_COLOR}}
+                style={{marginRight: 10, color: theme.themeColor}}
               />
               <Text>GitHub Popular</Text>
             </View>
@@ -97,7 +103,7 @@ class MyPage extends React.Component {
               style={{
                 marginRight: 10,
                 alignSelf: 'center',
-                color: THEME_COLOR,
+                color: theme.themeColor,
               }}
             />
           </TouchableOpacity>
