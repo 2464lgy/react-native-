@@ -15,6 +15,7 @@ export function handlerData(
   data,
   pageSize,
   favoriteDao,
+  params,
 ) {
   //TrendingRepoModel 没有items
   let fixItems = [];
@@ -34,6 +35,7 @@ export function handlerData(
       projectModels: projectModels,
       storeName,
       pageIndex: 1,
+      ...params,
     });
   });
 }
@@ -58,6 +60,12 @@ export async function _projectModels(showItems, favoriteDao, callback) {
     );
   }
   if (typeof callback === 'function') {
-    callback(projectModels);
+    doCallBack(callback, projectModels);
   }
 }
+
+export const doCallBack = (callBack, object) => {
+  if (typeof callBack === 'function') {
+    callBack(object);
+  }
+};

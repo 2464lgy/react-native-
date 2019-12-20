@@ -11,6 +11,7 @@ import {
 } from './trending';
 import {onLoadFavoriteData} from './favorite';
 import {onLoadLanguage} from './language';
+import {onSearch, onSearchCancel, onLoadMoreSearch} from './search';
 export default {
   onThemeChange,
   onRefreshPopular,
@@ -23,4 +24,7 @@ export default {
   onLoadLanguage,
   onShowCustomThemeView,
   onThemeInit,
+  onSearch,
+  onSearchCancel,
+  onLoadMoreSearch,
 };

@@ -4,6 +4,7 @@ import popular from './popular';
 import trending from './trending';
 import favorite from './favorite';
 import language from './language';
+import search from './search';
 /**
  * 1合并reducer
  */
@@ -13,5 +14,6 @@ const index = combineReducers({
   trending,
   favorite,
   language,
+  search,
 }); //reducer的聚合
 export default index;
