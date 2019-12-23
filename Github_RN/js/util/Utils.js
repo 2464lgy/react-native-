@@ -12,4 +12,10 @@ export default class Utils {
     }
     return false;
   }
+  static checkKeyIsExist(keys, key) {
+    for (let i = 0, l = keys.length; i < l; i++) {
+      if (key.toLowerCase() === keys[i].name.toLowerCase()) return true;
+    }
+    return false;
+  }
 }

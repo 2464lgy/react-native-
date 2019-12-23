@@ -4,9 +4,13 @@ import {
   FlatList,
   Text,
   StyleSheet,
+  TextInput,
   ActivityIndicator,
   Button,
   RefreshControl,
+  TouchableOpacity,
+  Platform,
+  Alert,
 } from 'react-native';
 import {createMaterialTopTabNavigator} from 'react-navigation-tabs';
 import {createAppContainer} from 'react-navigation';
@@ -24,9 +28,11 @@ import EventBus from 'react-native-event-bus';
 import EventTypes from '../util/EventTypes';
 import LanguageDao, {FLAG_LANGUAGE} from '../expand/dao/LanguageDao';
 import BackPressComponent from '../common/BackPreessComponent';
-const URL = 'https://api.github.com/search/repositories?q=';
-const QUERY_STR = '&sort=stars';
+import GlobalStyles from '../res/styles/GlobalStyles';
+import ViewUtil from '../util/ViewUtil';
+import Utils from '../util/Utils';
 const favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_popular);
+const pageSize = 10;
 class SearchPage extends React.Component {
   constructor(props) {
     super(props);
@@ -44,170 +50,48 @@ class SearchPage extends React.Component {
   componentWillUnmount() {
     this.backPress.componentWillUnmount();
   }
+
   loadData(loadMore) {
-    const {onLoadMoreSearch, onSearch} = this.props;
-  }
-  //动态生成tab
-  _genTabs() {
-    const tabs = {};
-    const {keys, theme} = this.props;
-    keys.forEach((item, index) => {
-      if (item.checked) {
-        tabs[`tab${index}`] = {
-          screen: props => (
-            <PopularTabPage
-              {...this.props}
-              tabLabel={item.name}
-              theme={theme}
-            />
-          ),
-          navigationOptions: {
-            title: item.name,
-          },
-        };
-      }
-    });
-    return tabs;
-  }
-  render() {
-    const {keys, theme} = this.props;
-    let statusBar = {
-      backgroundColor: theme.themeColor,
-      barStyle: 'light-content',
-    };
-    let navigationBar = (
-      <NavigationBar
-        title={'最热'}
-        statusBar={statusBar}
-        style={theme.styles.navBar}
-      />
-    );
-    const TabNavigator = keys.length
-      ? createAppContainer(
-          createMaterialTopTabNavigator(
-            this._genTabs(), //动态生成顶部导航
-            {
-              tabBarOptions: {
-                tabStyle: styles.tabStyle,
-                upperCaseLabel: false, //是否大写
-                scrollEnabled: true, //是否可以滚动
-                style: {
-                  backgroundColor: theme.themeColor,
-                  //  height: 30, //开启scrollEnabled后在android上初次加载时闪烁问题
-                },
-                indicatorStyle: styles.indicatorStyle,
-                labelStyle: styles.labelStyle,
-              },
-              lazy: true, //懒加载启用后popularTab每次只会渲染一个tab
-            },
-          ),
-        )
-      : null;
-    return (
-      <View style={styles.container}>
-        {navigationBar}
-        {/* <Text style={styles.welcome}>PopularPage</Text> */}
-        {TabNavigator && <TabNavigator />}
-      </View>
-    );
-  }
-}
-const mapPopularStateToProps = state => ({
-  keys: state.language.keys,
-  theme: state.theme.theme, //订阅theme
-});
-const mapPopularDispatchToProps = dispatch => ({
-  onLoadLanguage: flag => dispatch(actions.onLoadLanguage(flag)),
-});
-
-export default connect(
-  mapPopularStateToProps,
-  mapPopularDispatchToProps,
-)(SearchPage);
-const pageSize = 10; //设置为常量，防止修改
-class PopularTab extends React.Component {
-  constructor(props) {
-    super(props);
-    const {tabLabel} = this.props;
-    this.storeName = tabLabel;
-    this.isFavoriteChanged = false;
-  }
-  componentDidMount() {
-    this.loadData();
-    EventBus.getInstance().addListener(
-      EventTypes.favorite_changed_popular,
-      (this.favoriteChangeListener = () => {
-        this.isFavoriteChanged = true;
-      }),
-    );
-    EventBus.getInstance().addListener(
-      EventTypes.bottom_tab_select,
-      (this.bottomTabSelectListener = data => {
-        if (data.to === 0 && this.isFavoriteChanged) {
-          this.loadData(null, true);
-        }
-      }),
-    );
-  }
-
-  componentWillUnmount() {
-    EventBus.getInstance().removeListener(this.favoriteChangeListener);
-    EventBus.getInstance().removeListener(this.bottomTabSelectListener);
-  }
-
-  loadData(loadMore, refreshFavorite) {
-    const store = this._store();
-    const {
-      onRefreshPopular,
-      onLoadMorePopular,
-      onFlushPopularFavorite,
-    } = this.props;
-    const url = this.genFetchUrl(this.storeName);
+    const {onLoadMoreSearch, onSearch, search, keys} = this.props;
     if (loadMore) {
-      onLoadMorePopular(
-        this.storeName,
-        ++store.pageIndex,
+      onLoadMoreSearch(
+        ++search.pageIndex,
         pageSize,
-        store.items,
-        favoriteDao,
+        search.items,
+        this.favoriteDao,
         callback => {
-          this.refs.toast.show('没有更多了');
+          this.toast.show('没有更多了');
         },
       );
-    } else if (refreshFavorite) {
-      onFlushPopularFavorite(
-        this.storeName,
-        store.pageIndex,
-        pageSize,
-        store.items,
-        favoriteDao,
-      );
     } else {
-      onRefreshPopular(this.storeName, url, pageSize, favoriteDao);
+      onSearch(
+        this.inputKey,
+        pageSize,
+        (this.searchToken = new Date().getTime()),
+        this.favoriteDao,
+        keys,
+        message => {
+          this.toast.show(message);
+        },
+      );
     }
   }
-  /**
-   * 获取与当前页面相关的数据
-   */
-  _store() {
-    const {popular} = this.props;
-    let store = popular[this.storeName];
-    if (!store) {
-      store = {
-        items: [],
-        isLoading: false,
-        projectModels: [], //要显示的数据
-        hideLoadingMore: true, //默认隐藏加载更多
-      };
+  //返回事件
+  onBackPress() {
+    const {onSearchCancel, onLoadLanguage} = this.props;
+    onSearchCancel(); //退出时取消搜索
+    this.refs.input.blur();
+    NavigationUtil.goBack(this.props.navigation);
+    if (this.isKeyChange) {
+      //若点击了底部的收藏按钮，则会重新加载标签
+      onLoadLanguage(FLAG_LANGUAGE.flag_key); //重新加载标签
     }
-    return store;
+    return true;
   }
-  genFetchUrl(key) {
-    return URL + key + QUERY_STR;
-  }
+
   renderItem(data) {
     const item = data.item;
-    const {theme} = this.props;
+    const {theme} = this.params;
     return (
       <PopularItem
         projectModel={item}
@@ -238,58 +122,181 @@ class PopularTab extends React.Component {
     );
   }
   genIndicator() {
-    return this._store().hideLoadingMore ? null : (
+    const {search} = this.props;
+    return search.hideLoadingMore ? null : (
       <View style={styles.indicatorContainer}>
         <ActivityIndicator style={styles.indicator} />
         <Text>正在加载更多</Text>
       </View>
     );
   }
+  //保存收藏
+  saveKey() {
+    const {keys} = this.props;
+    let key = this.inputKey;
+    if (Utils.checkKeyIsExist(keys, key)) {
+      this.toast.show(key + '已经存在');
+    } else {
+      key = {
+        path: key,
+        name: key,
+        checked: true,
+      };
+      keys.unshift(key);
+      this.languageDao.save(keys);
+      this.toast.show(key.name + '保存成功');
+      this.isKeyChange = true;
+    }
+  }
+  onRightButtonClick() {
+    const {onSearchCancel, search} = this.props;
+    if (search.showText === '搜索') {
+      this.loadData();
+    } else {
+      onSearchCancel(this.searchToken);
+    }
+  }
+  renderNavBar() {
+    const {theme} = this.params;
+    const {showText, inputKey} = this.props.search;
+    const placeholder = inputKey || '请输入';
+    let backButton = ViewUtil.getLeftBackButton(() => {
+      this.onBackPress();
+    });
+    let inputView = (
+      <TextInput
+        ref="input"
+        placeholder={placeholder}
+        onChangeText={text => (this.inputKey = text)}
+        style={styles.textInput}
+      />
+    );
+    let rightButton = (
+      <TouchableOpacity
+        onPress={() => {
+          //   console.log(this.inputKey);
+          this.refs.input.blur(); //收起键盘
+          this.onRightButtonClick();
+        }}>
+        <View style={{marginRight: 10}}>
+          <Text style={styles.title}>{showText}</Text>
+        </View>
+      </TouchableOpacity>
+    );
+    return (
+      <View
+        style={{
+          backgroundColor: theme.themeColor,
+          flexDirection: 'row',
+          alignItems: 'center',
+          height:
+            Platform.OS === 'ios'
+              ? GlobalStyles.nav_bar_height_ios
+              : GlobalStyles.nav_bar_height_android,
+        }}>
+        {backButton}
+        {inputView}
+        {rightButton}
+      </View>
+    );
+  }
   render() {
-    let {theme} = this.props;
-    let store = this._store(); //popular[this.storeName]; //动态获取state
+    let {
+      isLoading,
+      projectModels,
+      showBottomButton,
+      hideLoadingMore,
+    } = this.props.search;
+    const {theme} = this.params;
+    let statusBar = null;
+    if (Platform.OS === 'ios') {
+      statusBar = (
+        <View
+          style={[
+            styles.statusBar,
+            {backgroundColor: this.params.theme.themeColor},
+          ]}
+        />
+      );
+    }
+    let listView = !isLoading ? (
+      <FlatList
+        data={projectModels}
+        renderItem={data => this.renderItem(data)}
+        keyExtractor={item => {
+          return '' + item.item.id;
+        }}
+        contentInset={
+          //设置底部安全距离
+          {
+            bottom: 45,
+          }
+        }
+        refreshControl={
+          //下拉刷新组件
+          <RefreshControl
+            title={'loading'}
+            titleColor={theme.themeColor}
+            colors={[theme.themeColor]}
+            refreshing={isLoading}
+            onRefresh={() => this.loadData()}
+            tintColor={theme.themeColor}
+          />
+        }
+        ListFooterComponent={() => this.genIndicator()}
+        onEndReached={() => {
+          //确保此函数执行在onMomentumScrollBegin执行之后，所以设置延时
+          //这里会多次调用，需要处理
+          console.log('__________________________--');
+          setTimeout(() => {
+            if (this.canLoadMore) {
+              this.loadData(true);
+              this.canLoadMore = false;
+            }
+          }, 100);
+        }}
+        onEndReachedThreshold={0.5}
+        onMomentumScrollBegin={() => {
+          this.canLoadMore = true; //初始化时页面调用onEndReached的问题
+        }}
+      />
+    ) : null;
+    let bottomButton = showBottomButton ? (
+      <TouchableOpacity
+        style={[styles.bottomButton, {backgroundColor: theme.themeColor}]}
+        onPress={() => {
+          this.saveKey();
+        }}>
+        <View style={{justifyContent: 'center'}}>
+          <Text style={styles.title}>朕收下了</Text>
+        </View>
+      </TouchableOpacity>
+    ) : null;
+    let indicatorView = isLoading ? (
+      <ActivityIndicator
+        style={styles.centering}
+        size="large"
+        animating={isLoading}
+      />
+    ) : null;
+    let resultView = (
+      <View style={{flex: 1}}>
+        {indicatorView}
+        {listView}
+      </View>
+    );
     return (
       <View style={styles.container}>
-        {/* <Text style={styles.welcome}>{tabLabel}</Text> */}
-        <FlatList
-          data={store.projectModels} //{store.items}
-          renderItem={data => this.renderItem(data)}
-          keyExtractor={item => {
-            return '' + item.item.id;
-          }}
-          refreshControl={
-            //下拉刷新组件
-            <RefreshControl
-              title={'loading'}
-              titleColor={theme.themeColor}
-              colors={[theme.themeColor]}
-              refreshing={store.isLoading}
-              onRefresh={() => this.loadData(true)}
-              tintColor={theme.themeColor}
-            />
-          }
-          ListFooterComponent={() => this.genIndicator()}
-          onEndReached={() => {
-            //确保此函数执行在onMomentumScrollBegin执行之后，所以设置延时
-            //这里会多次调用，需要处理
-            console.log('__________________________--');
-            setTimeout(() => {
-              if (this.canLoadMore) {
-                this.loadData(true);
-                this.canLoadMore = false;
-              }
-            }, 100);
-          }}
-          onEndReachedThreshold={0.5}
-          onMomentumScrollBegin={() => {
-            this.canLoadMore = true; //初始化时页面调用onEndReached的问题
-          }}
-        />
-        <Toast ref={'toast'} position={'center'} />
+        {statusBar}
+        {this.renderNavBar()}
+        {resultView}
+        {bottomButton}
+        <Toast ref={toast => (this.toast = toast)} position={'center'} />
       </View>
     );
   }
 }
+
 const mapStateToProps = state => ({
   search: state.search,
   keys: state.language.keys,
@@ -321,7 +328,7 @@ const mapDispatchToProps = dispatch => ({
 });
 //注意：connect只是一个函数，并不一定要放在export后面
 // eslint-disable-next-line prettier/prettier
-const PopularTabPage = connect(mapStateToProps, mapDispatchToProps)(PopularTab);
+export default connect(mapStateToProps, mapDispatchToProps)(SearchPage);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -350,5 +357,41 @@ const styles = StyleSheet.create({
   indicator: {
     color: 'red',
     margin: 10,
+  },
+  statusBar: {
+    height: 20,
+  },
+  bottomButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    opacity: 0.9,
+    height: 40,
+    position: 'absolute',
+    left: 10,
+    top: GlobalStyles.window_height - 45,
+    right: 10,
+    borderRadius: 3,
+  },
+  centering: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+  },
+  textInput: {
+    flex: 1,
+    height: Platform.OS === 'ios' ? 26 : 36,
+    borderWidth: Platform.OS === 'ios' ? 1 : 1,
+    borderColor: 'white',
+    alignSelf: 'center',
+    paddingLeft: 5,
+    marginRight: 10,
+    borderRadius: 3,
+    opacity: 0.7,
+    color: 'white',
+  },
+  title: {
+    fontSize: 18,
+    color: 'white',
+    fontWeight: '500',
   },
 });

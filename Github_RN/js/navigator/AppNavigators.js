@@ -6,6 +6,7 @@ import {createStackNavigator} from 'react-navigation-stack';
 import WelcomePage from '../page/WelcomePage';
 import HomePage from '../page/HomePage';
 import DetailPage from '../page/DetailPage';
+import SearchPage from '../page/SearchPage';
 import WebViewPage from '../page/WebViewPage';
 import AboutPage from '../page/about/AboutPage';
 import AboutMe from '../page/about/AboutMePage';
@@ -67,6 +68,12 @@ const MainNavigator = createStackNavigator({
   },
   CustomTheme: {
     screen: CustomTheme,
+    navigationOptions: {
+      header: null,
+    },
+  },
+  SearchPage: {
+    screen: SearchPage,
     navigationOptions: {
       header: null,
     },

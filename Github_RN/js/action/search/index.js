@@ -2,6 +2,8 @@ import Types from '../types';
 import DataStore, {FLAG_STORAGE} from '../../expand/dao/DataStore';
 import {handlerData, _projectModels, doCallBack} from '../ActionUtil';
 import ArrayUtil from '../../util/ArrayUtil';
+import Utils from '../../util/Utils';
+
 const API_URL = 'https://api.github.com/search/repositories?q=';
 const QUERY_STR = '&sort=starts';
 //保存取消的所有的key
@@ -59,7 +61,7 @@ export function onSearch(
           pageSize,
           favoriteDao,
           {
-            showBottomButton: !checkKeyIsExist(popularkeys, inputKey), //判断inputkey是否已经包含在popularkeys里面
+            showBottomButton: !Utils.checkKeyIsExist(popularkeys, inputKey), //判断inputkey是否已经包含在popularkeys里面
             inputKey,
           },
         );
@@ -81,12 +83,7 @@ function hasCancel(token, isRemove) {
   }
   return false;
 }
-function checkKeyIsExist(keys, key) {
-  for (let i = 0, l = keys.length; i < l; i++) {
-    if (key.toLowerCase() === keys[i].name.toLowerCase()) return true;
-  }
-  return false;
-}
+
 //取消一个异步任务
 export function onSearchCancel(token) {
   return dispatch => {
